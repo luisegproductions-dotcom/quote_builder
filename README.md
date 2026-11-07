@@ -2,6 +2,10 @@
 
 Mobile-first static internal quoting app. English, USD, no accounts or backend.
 
+## Open without a server
+
+Download `EG-Quote-Builder.html` and open it in your browser. This bundled version works directly from your computer without localhost or installing anything. Rebuild it after source changes with `python3 scripts/build-standalone.py`.
+
 ## Run
 
 `npm start` serves the app at http://localhost:5173. No package installation is required. Run calculation tests with `npm test`.

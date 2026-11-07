@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#171717"><meta name="description" content="EG Signs Solutions internal quote builder"><title>Quote Builder · EG Signs Solutions</title><style>:root{--ink:#171717;--muted:#707070;--line:#dededb;--paper:#f6f6f2;--accent:#df403d;--spectrum:linear-gradient(90deg,#e63946,#f4a300,#ffd60a,#2ec4b6,#3a86ff,#8338ec)}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.42}button:focus-visible,a:focus-visible{outline:3px solid #3267da;outline-offset:4px}input:focus,select:focus{outline:2px solid #3267da;outline-offset:1px}button{min-height:46px}button,select,input{border-radius:9px}button{transition:background .15s,transform .15s}button:active{transform:translateY(1px)}[hidden]{display:none!important}.header{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:22px 36px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none}.brand-mark{font-weight:900;font-style:italic;font-size:44px;letter-spacing:-5px;line-height:1}.brand-mark>span{font-size:10px;vertical-align:top;letter-spacing:0;display:inline-block;margin:3px 0 0 5px}.brand-name{font-weight:800;line-height:1;font-size:17px;letter-spacing:2px;border-left:1px solid #aaa;padding-left:12px}.brand-name small{font-size:9px;letter-spacing:1.6px}.internal{font-size:10px;font-weight:700;letter-spacing:1.5px;display:flex;align-items:center;gap:7px}.internal>span{height:6px;width:6px;background:#70a16d;border-radius:50%}.spectrum{height:4px;background:var(--spectrum)}main{max-width:1200px;margin:auto;padding:0 36px}.intro{padding:58px 0 38px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:2px}.intro h1{font-size:clamp(42px,5.7vw,72px);line-height:1.03;letter-spacing:-3px;margin:22px 0 20px}.intro h1 span{color:#777}.intro p,.builder-heading p{color:var(--muted);font-size:16px;line-height:1.6}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}h2{font-size:18px;letter-spacing:-.4px;margin:0;display:flex;align-items:center;gap:12px}.step{font-size:10px;letter-spacing:0;border:1px solid #c9c9c5;border-radius:50%;width:28px;height:28px;display:inline-grid;place-items:center;flex-shrink:0}.muted{font-size:12px;color:var(--muted)}.products{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.product{position:relative;background:white;border:1px solid var(--line);padding:24px;text-align:left;min-height:196px;color:var(--ink);border-radius:13px}.product:hover{border-color:var(--ink);background:#fffef9;transform:translateY(-3px)}.product .icon{display:grid;place-items:center;width:48px;height:48px;background:var(--paper);border-radius:10px;margin-bottom:25px}.product svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.product strong{font-size:16px;display:block;letter-spacing:-.35px}.product small{display:block;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.4}.product .arrow{position:absolute;right:20px;top:25px;color:#777}.start-note{display:flex;align-items:center;gap:15px;margin:28px 0 45px;color:var(--muted);font-size:12px;line-height:1.7}.start-note>span{border:1px solid var(--line);border-radius:50%;width:34px;height:34px;display:grid;place-items:center;font-size:19px}.start-note strong{color:var(--ink);font-weight:500}footer{border-top:1px solid var(--line);padding:23px 0 30px;display:flex;justify-content:space-between;font-size:9px;letter-spacing:1px;color:var(--muted)}.dot{padding:0 9px}.back{border:0;background:none;color:var(--muted);padding:0;margin-top:22px;font-size:13px}.builder-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:22px 0 30px}.builder-heading h1{font-size:36px;letter-spacing:-1.5px;margin:12px 0 8px}.builder-heading p{font-size:14px;margin:0}.workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px;align-items:start;margin-bottom:40px}.card{padding:26px;background:white;border:1px solid var(--line);border-radius:14px;margin-bottom:18px}.toggle{display:flex;padding:3px;background:var(--paper);border-radius:8px}.toggle button{border:0;background:none;padding:0 13px;font-size:12px;min-height:38px}.toggle button[aria-pressed=true]{background:var(--ink);color:white}.unit-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.unit-row select{width:170px}.hint{color:var(--muted);font-size:12px;line-height:1.65;margin:10px 0 18px}label{display:block;font-size:12px;font-weight:600;margin-bottom:8px}select,input{width:100%;min-height:47px;padding:11px;border:1px solid var(--line);background:white;color:var(--ink);font-size:16px}input[aria-invalid=true]{border-color:#bf3030}.panel{border:1px solid var(--line);border-radius:10px;padding:16px;margin:16px 0;background:#fcfcfa}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.panel-head strong{font-size:13px}.remove{border:0;background:none;font-size:12px;color:#777;padding:0 8px}.panel-fields{display:grid;grid-template-columns:1fr 1fr .65fr;gap:10px}.panel-info{font-size:11px;line-height:1.5;color:var(--muted);margin:12px 0 0;min-height:17px}.error{color:#b52b2b!important;font-size:12px;line-height:1.5}.add{width:100%;background:white;border:1px dashed #aaa;font-size:13px;font-weight:600}.price-fields{display:grid;grid-template-columns:1fr 1fr;gap:15px}.money-input{position:relative}.money-input span{position:absolute;top:14px;left:13px;color:var(--muted)}.money-input input{padding-left:30px}.primary,.secondary{padding:12px 17px;font-size:13px;font-weight:600;border:1px solid var(--line);background:white;color:var(--ink)}.primary{background:var(--ink);color:white;border-color:var(--ink)}.summary{position:sticky;top:24px;background:var(--ink);color:white;padding:28px;border-radius:14px;overflow:hidden}.summary:before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--spectrum)}.summary-top{display:flex;align-items:center;justify-content:space-between;color:#b6b6b6}.currency{font-size:10px;border:1px solid #505050;padding:5px 7px;border-radius:4px}.summary h2{margin:22px 0;font-size:23px}.quote-row{padding:14px 0;border-bottom:1px solid #3a3a3a;display:flex;justify-content:space-between;gap:12px;font-size:13px}.quote-row small{display:block;font-size:11px;line-height:1.6;color:#b5b5b5;margin-top:4px}.quote-row>strong{white-space:nowrap}.summary-stats{padding:17px 0}.summary-stats>div{display:flex;justify-content:space-between;gap:10px;font-size:12px;margin:12px 0}.summary-stats span{color:#b5b5b5}.grand-total{border-top:1px solid #444;padding-top:21px}.grand-total>span{font-size:12px;color:#c0c0c0}.grand-total>strong{font-size:48px;letter-spacing:-2px;display:block;margin:8px 0;overflow-wrap:anywhere}.grand-total p{font-size:11px;line-height:1.6;color:#b5b5b5}.quote-actions{display:grid;gap:10px;margin-top:24px}.quote-actions .primary{background:white;color:var(--ink);display:flex;justify-content:space-between}.quote-actions .secondary{background:transparent;color:white;border-color:#555}.summary-foot{font-size:9px;color:#aaa;text-align:center;margin:20px 0 0}.mobile-total{display:none}#toast:not(:empty){position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#fff;color:var(--ink);padding:16px 22px;border:1px solid var(--line);box-shadow:0 5px 30px #0002;border-radius:10px;font-size:13px;z-index:10;max-width:90vw}dialog{border:1px solid var(--line);border-radius:16px;padding:28px;max-width:90vw}dialog::backdrop{background:#0007}dialog p{font-size:14px;color:var(--muted)}.dialog-actions{display:flex;gap:12px;margin-top:24px}
+@media(max-width:900px){.products{grid-template-columns:repeat(2,1fr)}.workspace{grid-template-columns:1fr}.summary{position:relative;top:0}.builder-heading h1{font-size:32px}.mobile-total{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:12px 24px max(12px,env(safe-area-inset-bottom));align-items:center;justify-content:space-between;z-index:3}.mobile-total span{font-size:10px;display:block;color:var(--muted)}.mobile-total strong{font-size:22px;display:block;margin-top:3px}.mobile-total button{background:var(--ink);color:white;border:0;padding:0 20px;font-size:12px}body:has(#builder:not([hidden])){padding-bottom:90px}.summary{scroll-margin-top:20px}}
+@media(max-width:540px){.header{padding:18px 20px}.brand-mark{font-size:35px}.brand-name{font-size:14px}.brand-name small{font-size:8px}.internal{font-size:8px;letter-spacing:1px}main{padding:0 20px}.intro{padding:36px 0 28px}.intro h1{font-size:49px;letter-spacing:-2px}.intro p{font-size:14px;max-width:250px}.section-heading>.muted{display:none}h2{font-size:16px;gap:9px}.products{gap:10px}.product{padding:18px 15px;min-height:185px}.product strong{font-size:14px}.product small{font-size:11px}.product .arrow{right:14px;top:21px}.product .icon{margin-bottom:24px}.card{padding:18px}.card .section-heading{align-items:flex-start;flex-direction:column}.toggle{width:100%}.toggle button{flex:1}.panel{padding:12px}.panel-fields{grid-template-columns:1fr 1fr}.quantity-field{grid-column:1/-1}.quantity-field input{max-width:110px}.price-fields{grid-template-columns:1fr}.builder-heading{align-items:flex-start;flex-direction:column;margin-top:16px}.builder-heading .secondary{padding:6px 12px;min-height:38px}.builder-heading h1{font-size:30px}.summary{padding:24px}.start-note{margin-bottom:30px}.unit-row select{width:155px}footer{font-size:8px;letter-spacing:.5px}.grand-total>strong{font-size:42px}}
+@media print{body{background:white!important;padding:0!important}.header{padding:10px 0}.internal,.spectrum,.back,.builder-heading,.editor,.quote-actions,.mobile-total,footer,#toast,dialog,#choose{display:none!important}main{padding:0;max-width:none}.workspace{display:block}.summary{position:static;color:black;background:white;border:1px solid #ddd;overflow:visible}.summary:before{display:none}.summary *{color:black!important}.quote-row,.grand-total{border-color:#ddd}.quote-row{break-inside:avoid}.summary-foot{margin-top:30px}}
+</style></head>
+<body>
+<header class="header"><a class="brand" href="./" aria-label="EG Signs Solutions home"><span class="brand-mark">EG</span><span class="brand-name">SIGNS<br><small>SOLUTIONS</small></span></a><span class="internal"><span></span> INTERNAL TOOL</span></header>
+<div class="spectrum"></div>
+<main>
+<section id="choose">
+<div class="intro"><div class="eyebrow">LESS ADMIN. MORE CREATING.</div><h1>Great signs.<br><span>Quick quotes.</span></h1><p>Start with a product. Build a quote in a few taps.</p></div>
+<div class="section-heading"><h2><span class="step">01</span> What are we creating?</h2><span class="muted">8 products & services</span></div>
+<div id="products" class="products"></div>
+<div class="start-note"><span aria-hidden="true">&#8594;</span><p><strong>Made for quoting on the go.</strong><br>Live calculations, flexible measurements, and a quote ready to share.</p></div>
+</section>
+<section id="builder" hidden>
+<button class="back" id="back">← All products</button>
+<div class="builder-heading"><div><div class="eyebrow">LET’S MAKE IT HAPPEN</div><h1 id="product-title"></h1><p id="product-description"></p></div><button id="clear" class="secondary">Clear quote</button></div>
+<div class="workspace"><div class="editor">
+<section class="card"><div class="section-heading"><h2><span class="step">02</span> Measurements</h2><div class="toggle" role="group" aria-label="Measurement system"><button data-system="imperial" aria-pressed="true">Inches</button><button data-system="metric" aria-pressed="false">Metric</button></div></div>
+<div class="unit-row"><label for="unit">Measurement unit</label><select id="unit"></select></div><p class="hint">Switching units converts your measurements automatically.</p>
+<div id="panels"></div><button class="add" id="add">＋ Add another size</button>
+</section>
+<section class="card"><h2><span class="step">03</span> Set your price</h2><p class="hint">Enter your rate, just like the original calculator.</p><div class="price-fields"><div><label for="basis">Charge by</label><select id="basis"><option value="in2">Square inch (in²)</option><option value="ft2">Square foot (ft²)</option></select></div><div><label for="rate" id="rate-label">Price per in² (USD)</label><div class="money-input"><span>$</span><input id="rate" type="number" inputmode="decimal" min="0" step="any" placeholder="0.00"></div></div></div><p id="rate-error" class="error" role="status"></p><p class="hint">Area is rounded to 2 decimals per panel before pricing. No taxes or additional fees are added.</p></section>
+</div>
+<aside class="summary" id="summary"><div class="summary-top"><span class="eyebrow">YOUR QUOTE</span><span class="currency">USD</span></div><h2 id="summary-product"></h2><div id="quote-rows"></div><div class="summary-stats"><div><span>Total panels</span><strong id="total-quantity">—</strong></div><div><span>Billable area</span><strong id="total-area">—</strong></div><div><span id="summary-rate-label">Rate per in²</span><strong id="summary-rate">—</strong></div></div><div class="grand-total"><span>Estimated total</span><strong id="total">—</strong><p id="quote-status">Add measurements and a rate to finish your quote.</p></div><div class="quote-actions"><button id="copy" class="primary">Copy quote <span aria-hidden="true">&#8594;</span></button><button id="print" class="secondary">Print / Save PDF</button></div><p class="summary-foot">EG Signs Solutions · Made to stand out.</p></aside>
+</div></section>
+<footer><span>EG SIGNS SOLUTIONS</span><span>Quote builder <span class="dot">/</span> v1.0</span></footer>
+</main><div class="mobile-total" id="mobile-total" hidden><div><span>Estimated total · USD</span><strong id="mobile-amount">—</strong></div><button id="view-quote">View quote ↓</button></div><div id="toast" role="status" aria-live="polite"></div>
+<dialog id="clear-dialog"><h2>Clear this quote?</h2><p>Your measurements and price will be removed.</p><div class="dialog-actions"><button id="cancel-clear" class="secondary">Keep editing</button><button id="confirm-clear" class="primary">Clear quote</button></div></dialog>
+<script>
+// Matches cotizador-EG v2.4.1: round each panel's billable area before
+// multiplying by quantity, then round each subtotal before summing.
+const units = { in: 25.4, ft: 304.8, yd: 914.4, mm: 1, cm: 10, m: 1000 };
+const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+function calculate(panels, unit, basis, rate) {
+  const price = rate === '' ? null : Number(rate);
+  const priceValid = price !== null && Number.isFinite(price) && price >= 0;
+  const rows = panels.map(p => {
+    const h = Number(p.height), w = Number(p.width), qty = Number(p.quantity);
+    const valid = [h,w,qty].every(n => Number.isFinite(n) && n > 0) && Number.isInteger(qty);
+    if (!valid) return { ...p, valid: false };
+    const squareInches = (h * units[unit] / 25.4) * (w * units[unit] / 25.4);
+    const area = round2(squareInches / (basis === 'ft2' ? 144 : 1));
+    const billableArea = round2(area * qty);
+    const subtotal = priceValid ? round2(billableArea * price) : null;
+    return {...p, valid: [area,billableArea,squareInches,subtotal ?? 0].every(Number.isFinite), area, billableArea, squareInches: squareInches * qty, subtotal };
+  });
+  const validRows = rows.filter(r => r.valid);
+  const ready = rows.length > 0 && rows.every(r => r.valid) && priceValid;
+  const total = ready ? round2(rows.reduce((sum,r) => sum + r.subtotal, 0)) : null;
+  return { rows, priceValid, ready: ready && Number.isFinite(total), total: Number.isFinite(total) ? total : null,
+    area: round2(validRows.reduce((sum,r)=>sum+r.billableArea,0)),
+    squareInches: validRows.reduce((sum,r)=>sum+r.squareInches,0),
+    quantity: validRows.reduce((sum,r)=>sum+Number(r.quantity),0) };
+}
+function convert(value, from, to) {
+  if(value === '') return '';
+  return String(Number((Number(value) * units[from] / units[to]).toPrecision(15)));
+}
+
+
+const $ = id => document.getElementById(id);
+const products = [
+ ['channel','Channel letters','Dimensional. Bold. Illuminated.','<path d="M7 24V8h8M7 16h7M18 8h7v16h-7V8Z"/>','Enter the dimensions of each letter or sign panel.'],
+ ['reverse','Reverse channel letters','A glow that stands apart.','<path d="M8 24V8h14M8 16h11M8 24h14M4 5v22M7 4h18M25 8v19"/>','Enter the dimensions of each halo-lit letter or sign panel.'],
+ ['coroplastic','Coroplastic signs','Lightweight. Big impact.','<rect x="4" y="5" width="24" height="17" rx="1"/><path d="M10 22v6M22 22v6M9 10h14M9 15h9"/>','Add each sign size and the number of signs you need.'],
+ ['banner','Banners','Your message, larger than life.','<path d="M3 5v23M29 5v23M3 8h26v15H3M8 12h16M8 17h10"/>','Add each banner size and quantity.'],
+ ['wall','Wall prints','Turn walls into statements.','<rect x="4" y="4" width="24" height="24" rx="1"/><path d="m5 23 8-10 7 7 4-5 4 5M19 9h.01"/>','Measure each wall or print section separately.'],
+ ['full-wrap','Full car wrap','A moving brand experience.','<path d="m3 18 3-8h18l5 8v7H3v-7ZM6 18h20M11 10l-2 8M21 10l3 8M7 25v3M25 25v3M6 22h3M23 22h3"/>','Add measured vehicle panels. Price is based on entered area, not a vehicle-size preset.'],
+ ['semi-wrap','Semi-car wrap','Less coverage. Lasting impact.','<path d="m3 18 4-7h16l6 7v7H3v-7ZM6 18h20M16 11v14M7 25v3M25 25v3M19 21h7"/>','Add only the vehicle panels or sections being wrapped.'],
+ ['window','Window graphics','Make every window work.','<rect x="4" y="4" width="24" height="24" rx="1"/><path d="M16 4v24M4 16h24M7 12l5-5M20 25l5-5"/>','Add each window size and quantity.']
+];
+const blankPanel = () => ({height:'',width:'',quantity:'1'});
+let state = { product:null, unit:'in', basis:'in2', rate:'', panels:[blankPanel()] };
+const labels = {in:'Inches (in)',ft:'Feet (ft)',yd:'Yards (yd)',mm:'Millimeters (mm)',cm:'Centimeters (cm)',m:'Meters (m)'};
+const usd = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+const num = n => new Intl.NumberFormat('en-US',{maximumFractionDigits:2,minimumFractionDigits:2}).format(n);
+const escape = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const areaUnit = () => state.basis==='ft2'?'ft²':'in²';
+let quoteText = '';
+$('products').innerHTML = products.map(([id,name,tag,icon])=>`<button class="product" data-product="${id}"><span class="icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icon}</svg></span><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></svg></span><strong>${name}</strong><small>${tag}</small></button>`).join('');
+$('products').addEventListener('click',e=>{const b=e.target.closest('[data-product]');if(!b)return; state.product=b.dataset.product;openBuilder();});
+function openBuilder(){
+ const product=products.find(p=>p[0]===state.product);
+ $('choose').hidden=true;$('builder').hidden=false;$('mobile-total').hidden=false;
+ $('product-title').textContent=product[1];$('product-description').textContent=product[4];$('summary-product').textContent=product[1];
+ renderUnits();renderPanels();$('basis').value=state.basis;$('rate').value=state.rate;update();window.scrollTo(0,0);
+}
+function renderUnits(){
+ const metric=['mm','cm','m'].includes(state.unit);
+ document.querySelectorAll('[data-system]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.system==='metric')===metric)));
+ $('unit').innerHTML=(metric?['mm','cm','m']:['in','ft','yd']).map(u=>`<option value="${u}" ${u===state.unit?'selected':''}>${labels[u]}</option>`).join('');
+}
+function renderPanels(){
+ $('panels').innerHTML=state.panels.map((p,i)=>`<div class="panel" data-index="${i}"><div class="panel-head"><strong>Panel ${String(i+1).padStart(2,'0')}</strong><button class="remove" aria-label="Remove panel ${i+1}" ${state.panels.length===1?'hidden':''}>Remove ×</button></div><div class="panel-fields">${[['height','Height'],['width','Width'],['quantity','Quantity']].map(([key,label])=>`<div class="${key==='quantity'?'quantity-field':''}"><label for="${key}-${i}">${label}${key!=='quantity'?` (${state.unit})`:''}</label><input id="${key}-${i}" data-field="${key}" type="number" inputmode="${key==='quantity'?'numeric':'decimal'}" min="${key==='quantity'?'1':'0'}" step="${key==='quantity'?'1':'any'}" value="${escape(p[key])}" placeholder="${key==='height'?'e.g. 24':'e.g. 36'}" aria-describedby="info-${i}"></div>`).join('')}</div><p class="panel-info" id="info-${i}">Enter a height and width to calculate the area.</p></div>`).join('');
+}
+function update(){
+ const result=calculate(state.panels,state.unit,state.basis,state.rate), au=areaUnit();
+ $('rate-label').textContent=`Price per ${au} (USD)`;$('summary-rate-label').textContent=`Rate per ${au}`;
+ $('rate-error').textContent=state.rate!==''&&!result.priceValid?'Enter a valid rate of $0 or more.':'';
+ $('rate').setAttribute('aria-invalid',String(state.rate!==''&&!result.priceValid));
+ result.rows.forEach((r,i)=>{
+  const info=$(`info-${i}`); const p=state.panels[i];
+  let error='';
+  for(const key of ['height','width','quantity']){
+   const n=Number(p[key]);const invalid=p[key]!==''&&(!Number.isFinite(n)||n<=0||(key==='quantity'&&!Number.isInteger(n)));
+   $(`${key}-${i}`).setAttribute('aria-invalid',String(invalid));
+   if(invalid) error=key==='quantity'?'Quantity must be a whole number of 1 or more.':'Measurements must be greater than zero.';
+  }
+  if(!r.valid&&!error&&p.height!==''&&p.width!==''&&p.quantity!=='')error='These values are too large to calculate.';
+  info.classList.toggle('error',!!error);
+  info.textContent=error||(r.valid?`${num(r.area)} ${au} per panel × ${r.quantity} = ${num(r.billableArea)} ${au}`:'Enter a height, width, and quantity to calculate the area.');
+ });
+ $('quote-rows').innerHTML=result.rows.map((r,i)=>`<div class="quote-row"><div>Panel ${String(i+1).padStart(2,'0')}<small>${r.valid?`${escape(r.height)} × ${escape(r.width)} ${state.unit} · Qty ${escape(r.quantity)}<br>${num(r.area)} ${au} each`:'Measurements incomplete'}</small></div><strong>${r.valid&&r.subtotal!==null?usd(r.subtotal):'—'}</strong></div>`).join('');
+ $('total-quantity').textContent=result.quantity||'—';$('total-area').textContent=result.quantity?`${num(result.area)} ${au}`:'—';$('summary-rate').textContent=result.priceValid?usd(Number(state.rate)):'—';
+ $('total').textContent=result.ready?usd(result.total):'—';$('mobile-amount').textContent=$('total').textContent;
+ $('quote-status').textContent=result.ready?'Ready to share. Based on your entered area and rate.':'Complete every panel and enter a rate to finish your quote.';
+ $('copy').disabled=!result.ready;$('print').disabled=!result.ready;
+ const title=products.find(p=>p[0]===state.product)?.[1]||'';
+ quoteText=result.ready?['QUOTE — EG Signs Solutions',title,new Date().toLocaleDateString('en-US'),'',...result.rows.map((r,i)=>`Panel ${i+1}: ${r.height} × ${r.width} ${state.unit} · ${num(r.area)} ${au} × ${r.quantity} panels = ${usd(r.subtotal)}`),'',`Total panels: ${result.quantity}`,`Total billable area: ${num(result.area)} ${au}`,`Price per ${au}: ${usd(Number(state.rate))}`,`ESTIMATED TOTAL: ${usd(result.total)} USD`,'No taxes or additional fees added.'].join('\n'):'';
+}
+$('panels').addEventListener('input',e=>{if(!e.target.dataset.field)return;const i=Number(e.target.closest('[data-index]').dataset.index);state.panels[i][e.target.dataset.field]=e.target.value;update();});
+$('panels').addEventListener('click',e=>{if(!e.target.closest('.remove'))return;const i=Number(e.target.closest('[data-index]').dataset.index);state.panels.splice(i,1);renderPanels();update();});
+$('add').addEventListener('click',()=>{state.panels.push(blankPanel());renderPanels();update();$(`height-${state.panels.length-1}`).focus();});
+function setUnit(next){
+ if(state.panels.some(p=>['height','width'].some(k=>p[k]!==''&&(!Number.isFinite(Number(p[k]))||Number(p[k])<=0)))){toast('Correct invalid measurements before switching units.');renderUnits();return;}
+ state.panels=state.panels.map(p=>({...p,height:convert(p.height,state.unit,next),width:convert(p.width,state.unit,next)}));state.unit=next;renderUnits();renderPanels();update();
+}
+$('unit').addEventListener('change',e=>setUnit(e.target.value));
+document.querySelectorAll('[data-system]').forEach(b=>b.addEventListener('click',()=>{if(b.getAttribute('aria-pressed')==='true')return;setUnit(b.dataset.system==='metric'?'mm':'in');}));
+$('rate').addEventListener('input',e=>{state.rate=e.target.value;update();});
+$('basis').addEventListener('change',e=>{state.basis=e.target.value;update();});
+$('back').addEventListener('click',()=>{$('choose').hidden=false;$('builder').hidden=true;$('mobile-total').hidden=true;window.scrollTo(0,0);});
+$('view-quote').addEventListener('click',()=>$('summary').scrollIntoView({behavior:'smooth'}));
+function toast(message){$('toast').textContent=message;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').textContent='',4000);}
+$('copy').addEventListener('click',async()=>{
+ if(!quoteText)return;
+ try {await navigator.clipboard.writeText(quoteText);toast('Quote copied. Ready to paste and share.');}
+ catch {const ta=document.createElement('textarea');ta.value=quoteText;document.body.append(ta);ta.select();const ok=document.execCommand('copy');ta.remove();toast(ok?'Quote copied. Ready to paste and share.':'Clipboard unavailable. Use Print / Save PDF instead.');}
+});
+$('print').addEventListener('click',()=>{if(quoteText)window.print();});
+$('clear').addEventListener('click',()=>$('clear-dialog').showModal());
+$('cancel-clear').addEventListener('click',()=>$('clear-dialog').close());
+$('confirm-clear').addEventListener('click',()=>{state.panels=[blankPanel()];state.rate='';$('rate').value='';renderPanels();update();$('clear-dialog').close();$('height-0').focus();toast('Quote cleared.');});
+
+</script></body></html>
