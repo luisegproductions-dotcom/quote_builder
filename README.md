@@ -10,7 +10,9 @@ Download `EG-Quote-Builder.html` and open it in your browser. This bundled versi
 
 `npm start` serves the app at http://localhost:5173. No package installation is required. Run calculation tests with `npm test`.
 
-Deploy the repository files to any static web host. Relative asset paths support subdirectory hosting. This implementation does not publish a deployment automatically.
+Run `npm run build` to create the static site in `dist/`. Relative asset paths support subdirectory hosting.
+
+For a persistent live site, import `luisegproductions-dotcom/quote_builder` in Netlify and select branch `main`. The included `netlify.toml` sets build command `npm run build` and publish directory `dist`. Netlify will provide the live URL and deploy future pushes. This requires authorizing Netlify to access the private repository. `.netlify/` is ignored so local linking metadata is never committed. No site has been deployed from this workspace yet.
 
 ## Features
 
