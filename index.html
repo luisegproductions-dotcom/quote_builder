@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#171717"><meta name="description" content="EG Signs Solutions internal quote builder"><title>Quote Builder · EG Signs Solutions</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="header"><a class="brand" href="./" aria-label="EG Signs Solutions home"><span class="brand-mark">EG</span><span class="brand-name">SIGNS<br><small>SOLUTIONS</small></span></a><span class="internal"><span></span> INTERNAL TOOL</span></header>
+<div class="spectrum"></div>
+<main>
+<section id="choose">
+<div class="intro"><div class="eyebrow">LESS ADMIN. MORE CREATING.</div><h1>Great signs.<br><span>Quick quotes.</span></h1><p>Start with a product. Build a quote in a few taps.</p></div>
+<div class="section-heading"><h2><span class="step">01</span> What are we creating?</h2><span class="muted">8 products & services</span></div>
+<div id="products" class="products"></div>
+<div class="start-note"><span aria-hidden="true">&#8594;</span><p><strong>Made for quoting on the go.</strong><br>Live calculations, flexible measurements, and a quote ready to share.</p></div>
+</section>
+<section id="builder" hidden>
+<button class="back" id="back">← All products</button>
+<div class="builder-heading"><div><div class="eyebrow">LET’S MAKE IT HAPPEN</div><h1 id="product-title"></h1><p id="product-description"></p></div><button id="clear" class="secondary">Clear quote</button></div>
+<div class="workspace"><div class="editor">
+<section class="card"><div class="section-heading"><h2><span class="step">02</span> Measurements</h2><div class="toggle" role="group" aria-label="Measurement system"><button data-system="imperial" aria-pressed="true">Inches</button><button data-system="metric" aria-pressed="false">Metric</button></div></div>
+<div class="unit-row"><label for="unit">Measurement unit</label><select id="unit"></select></div><p class="hint">Switching units converts your measurements automatically.</p>
+<div id="panels"></div><button class="add" id="add">＋ Add another size</button>
+</section>
+<section class="card"><h2><span class="step">03</span> Set your price</h2><p class="hint">Enter your rate, just like the original calculator.</p><div class="price-fields"><div><label for="basis">Charge by</label><select id="basis"><option value="in2">Square inch (in²)</option><option value="ft2">Square foot (ft²)</option></select></div><div><label for="rate" id="rate-label">Price per in² (USD)</label><div class="money-input"><span>$</span><input id="rate" type="number" inputmode="decimal" min="0" step="any" placeholder="0.00"></div></div></div><p id="rate-error" class="error" role="status"></p><p class="hint">Area is rounded to 2 decimals per panel before pricing. No taxes or additional fees are added.</p></section>
+</div>
+<aside class="summary" id="summary"><div class="summary-top"><span class="eyebrow">YOUR QUOTE</span><span class="currency">USD</span></div><h2 id="summary-product"></h2><div id="quote-rows"></div><div class="summary-stats"><div><span>Total panels</span><strong id="total-quantity">—</strong></div><div><span>Billable area</span><strong id="total-area">—</strong></div><div><span id="summary-rate-label">Rate per in²</span><strong id="summary-rate">—</strong></div></div><div class="grand-total"><span>Estimated total</span><strong id="total">—</strong><p id="quote-status">Add measurements and a rate to finish your quote.</p></div><div class="quote-actions"><button id="copy" class="primary">Copy quote <span aria-hidden="true">&#8594;</span></button><button id="print" class="secondary">Print / Save PDF</button></div><p class="summary-foot">EG Signs Solutions · Made to stand out.</p></aside>
+</div></section>
+<footer><span>EG SIGNS SOLUTIONS</span><span>Quote builder <span class="dot">/</span> v1.0</span></footer>
+</main><div class="mobile-total" id="mobile-total" hidden><div><span>Estimated total · USD</span><strong id="mobile-amount">—</strong></div><button id="view-quote">View quote ↓</button></div><div id="toast" role="status" aria-live="polite"></div>
+<dialog id="clear-dialog"><h2>Clear this quote?</h2><p>Your measurements and price will be removed.</p><div class="dialog-actions"><button id="cancel-clear" class="secondary">Keep editing</button><button id="confirm-clear" class="primary">Clear quote</button></div></dialog>
+<script type="module" src="app.js"></script></body></html>

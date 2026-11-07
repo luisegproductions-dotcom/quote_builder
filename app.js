@@ -1,0 +1,84 @@
+import { calculate, convert } from './pricing.js';
+const $ = id => document.getElementById(id);
+const products = [
+ ['channel','Channel letters','Dimensional. Bold. Illuminated.','<path d="M7 24V8h8M7 16h7M18 8h7v16h-7V8Z"/>','Enter the dimensions of each letter or sign panel.'],
+ ['reverse','Reverse channel letters','A glow that stands apart.','<path d="M8 24V8h14M8 16h11M8 24h14M4 5v22M7 4h18M25 8v19"/>','Enter the dimensions of each halo-lit letter or sign panel.'],
+ ['coroplastic','Coroplastic signs','Lightweight. Big impact.','<rect x="4" y="5" width="24" height="17" rx="1"/><path d="M10 22v6M22 22v6M9 10h14M9 15h9"/>','Add each sign size and the number of signs you need.'],
+ ['banner','Banners','Your message, larger than life.','<path d="M3 5v23M29 5v23M3 8h26v15H3M8 12h16M8 17h10"/>','Add each banner size and quantity.'],
+ ['wall','Wall prints','Turn walls into statements.','<rect x="4" y="4" width="24" height="24" rx="1"/><path d="m5 23 8-10 7 7 4-5 4 5M19 9h.01"/>','Measure each wall or print section separately.'],
+ ['full-wrap','Full car wrap','A moving brand experience.','<path d="m3 18 3-8h18l5 8v7H3v-7ZM6 18h20M11 10l-2 8M21 10l3 8M7 25v3M25 25v3M6 22h3M23 22h3"/>','Add measured vehicle panels. Price is based on entered area, not a vehicle-size preset.'],
+ ['semi-wrap','Semi-car wrap','Less coverage. Lasting impact.','<path d="m3 18 4-7h16l6 7v7H3v-7ZM6 18h20M16 11v14M7 25v3M25 25v3M19 21h7"/>','Add only the vehicle panels or sections being wrapped.'],
+ ['window','Window graphics','Make every window work.','<rect x="4" y="4" width="24" height="24" rx="1"/><path d="M16 4v24M4 16h24M7 12l5-5M20 25l5-5"/>','Add each window size and quantity.']
+];
+const blankPanel = () => ({height:'',width:'',quantity:'1'});
+let state = { product:null, unit:'in', basis:'in2', rate:'', panels:[blankPanel()] };
+const labels = {in:'Inches (in)',ft:'Feet (ft)',yd:'Yards (yd)',mm:'Millimeters (mm)',cm:'Centimeters (cm)',m:'Meters (m)'};
+const usd = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+const num = n => new Intl.NumberFormat('en-US',{maximumFractionDigits:2,minimumFractionDigits:2}).format(n);
+const escape = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const areaUnit = () => state.basis==='ft2'?'ft²':'in²';
+let quoteText = '';
+$('products').innerHTML = products.map(([id,name,tag,icon])=>`<button class="product" data-product="${id}"><span class="icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icon}</svg></span><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></svg></span><strong>${name}</strong><small>${tag}</small></button>`).join('');
+$('products').addEventListener('click',e=>{const b=e.target.closest('[data-product]');if(!b)return; state.product=b.dataset.product;openBuilder();});
+function openBuilder(){
+ const product=products.find(p=>p[0]===state.product);
+ $('choose').hidden=true;$('builder').hidden=false;$('mobile-total').hidden=false;
+ $('product-title').textContent=product[1];$('product-description').textContent=product[4];$('summary-product').textContent=product[1];
+ renderUnits();renderPanels();$('basis').value=state.basis;$('rate').value=state.rate;update();window.scrollTo(0,0);
+}
+function renderUnits(){
+ const metric=['mm','cm','m'].includes(state.unit);
+ document.querySelectorAll('[data-system]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.system==='metric')===metric)));
+ $('unit').innerHTML=(metric?['mm','cm','m']:['in','ft','yd']).map(u=>`<option value="${u}" ${u===state.unit?'selected':''}>${labels[u]}</option>`).join('');
+}
+function renderPanels(){
+ $('panels').innerHTML=state.panels.map((p,i)=>`<div class="panel" data-index="${i}"><div class="panel-head"><strong>Panel ${String(i+1).padStart(2,'0')}</strong><button class="remove" aria-label="Remove panel ${i+1}" ${state.panels.length===1?'hidden':''}>Remove ×</button></div><div class="panel-fields">${[['height','Height'],['width','Width'],['quantity','Quantity']].map(([key,label])=>`<div class="${key==='quantity'?'quantity-field':''}"><label for="${key}-${i}">${label}${key!=='quantity'?` (${state.unit})`:''}</label><input id="${key}-${i}" data-field="${key}" type="number" inputmode="${key==='quantity'?'numeric':'decimal'}" min="${key==='quantity'?'1':'0'}" step="${key==='quantity'?'1':'any'}" value="${escape(p[key])}" placeholder="${key==='height'?'e.g. 24':'e.g. 36'}" aria-describedby="info-${i}"></div>`).join('')}</div><p class="panel-info" id="info-${i}">Enter a height and width to calculate the area.</p></div>`).join('');
+}
+function update(){
+ const result=calculate(state.panels,state.unit,state.basis,state.rate), au=areaUnit();
+ $('rate-label').textContent=`Price per ${au} (USD)`;$('summary-rate-label').textContent=`Rate per ${au}`;
+ $('rate-error').textContent=state.rate!==''&&!result.priceValid?'Enter a valid rate of $0 or more.':'';
+ $('rate').setAttribute('aria-invalid',String(state.rate!==''&&!result.priceValid));
+ result.rows.forEach((r,i)=>{
+  const info=$(`info-${i}`); const p=state.panels[i];
+  let error='';
+  for(const key of ['height','width','quantity']){
+   const n=Number(p[key]);const invalid=p[key]!==''&&(!Number.isFinite(n)||n<=0||(key==='quantity'&&!Number.isInteger(n)));
+   $(`${key}-${i}`).setAttribute('aria-invalid',String(invalid));
+   if(invalid) error=key==='quantity'?'Quantity must be a whole number of 1 or more.':'Measurements must be greater than zero.';
+  }
+  if(!r.valid&&!error&&p.height!==''&&p.width!==''&&p.quantity!=='')error='These values are too large to calculate.';
+  info.classList.toggle('error',!!error);
+  info.textContent=error||(r.valid?`${num(r.area)} ${au} per panel × ${r.quantity} = ${num(r.billableArea)} ${au}`:'Enter a height, width, and quantity to calculate the area.');
+ });
+ $('quote-rows').innerHTML=result.rows.map((r,i)=>`<div class="quote-row"><div>Panel ${String(i+1).padStart(2,'0')}<small>${r.valid?`${escape(r.height)} × ${escape(r.width)} ${state.unit} · Qty ${escape(r.quantity)}<br>${num(r.area)} ${au} each`:'Measurements incomplete'}</small></div><strong>${r.valid&&r.subtotal!==null?usd(r.subtotal):'—'}</strong></div>`).join('');
+ $('total-quantity').textContent=result.quantity||'—';$('total-area').textContent=result.quantity?`${num(result.area)} ${au}`:'—';$('summary-rate').textContent=result.priceValid?usd(Number(state.rate)):'—';
+ $('total').textContent=result.ready?usd(result.total):'—';$('mobile-amount').textContent=$('total').textContent;
+ $('quote-status').textContent=result.ready?'Ready to share. Based on your entered area and rate.':'Complete every panel and enter a rate to finish your quote.';
+ $('copy').disabled=!result.ready;$('print').disabled=!result.ready;
+ const title=products.find(p=>p[0]===state.product)?.[1]||'';
+ quoteText=result.ready?['QUOTE — EG Signs Solutions',title,new Date().toLocaleDateString('en-US'),'',...result.rows.map((r,i)=>`Panel ${i+1}: ${r.height} × ${r.width} ${state.unit} · ${num(r.area)} ${au} × ${r.quantity} panels = ${usd(r.subtotal)}`),'',`Total panels: ${result.quantity}`,`Total billable area: ${num(result.area)} ${au}`,`Price per ${au}: ${usd(Number(state.rate))}`,`ESTIMATED TOTAL: ${usd(result.total)} USD`,'No taxes or additional fees added.'].join('\n'):'';
+}
+$('panels').addEventListener('input',e=>{if(!e.target.dataset.field)return;const i=Number(e.target.closest('[data-index]').dataset.index);state.panels[i][e.target.dataset.field]=e.target.value;update();});
+$('panels').addEventListener('click',e=>{if(!e.target.closest('.remove'))return;const i=Number(e.target.closest('[data-index]').dataset.index);state.panels.splice(i,1);renderPanels();update();});
+$('add').addEventListener('click',()=>{state.panels.push(blankPanel());renderPanels();update();$(`height-${state.panels.length-1}`).focus();});
+function setUnit(next){
+ if(state.panels.some(p=>['height','width'].some(k=>p[k]!==''&&(!Number.isFinite(Number(p[k]))||Number(p[k])<=0)))){toast('Correct invalid measurements before switching units.');renderUnits();return;}
+ state.panels=state.panels.map(p=>({...p,height:convert(p.height,state.unit,next),width:convert(p.width,state.unit,next)}));state.unit=next;renderUnits();renderPanels();update();
+}
+$('unit').addEventListener('change',e=>setUnit(e.target.value));
+document.querySelectorAll('[data-system]').forEach(b=>b.addEventListener('click',()=>{if(b.getAttribute('aria-pressed')==='true')return;setUnit(b.dataset.system==='metric'?'mm':'in');}));
+$('rate').addEventListener('input',e=>{state.rate=e.target.value;update();});
+$('basis').addEventListener('change',e=>{state.basis=e.target.value;update();});
+$('back').addEventListener('click',()=>{$('choose').hidden=false;$('builder').hidden=true;$('mobile-total').hidden=true;window.scrollTo(0,0);});
+$('view-quote').addEventListener('click',()=>$('summary').scrollIntoView({behavior:'smooth'}));
+function toast(message){$('toast').textContent=message;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').textContent='',4000);}
+$('copy').addEventListener('click',async()=>{
+ if(!quoteText)return;
+ try {await navigator.clipboard.writeText(quoteText);toast('Quote copied. Ready to paste and share.');}
+ catch {const ta=document.createElement('textarea');ta.value=quoteText;document.body.append(ta);ta.select();const ok=document.execCommand('copy');ta.remove();toast(ok?'Quote copied. Ready to paste and share.':'Clipboard unavailable. Use Print / Save PDF instead.');}
+});
+$('print').addEventListener('click',()=>{if(quoteText)window.print();});
+$('clear').addEventListener('click',()=>$('clear-dialog').showModal());
+$('cancel-clear').addEventListener('click',()=>$('clear-dialog').close());
+$('confirm-clear').addEventListener('click',()=>{state.panels=[blankPanel()];state.rate='';$('rate').value='';renderPanels();update();$('clear-dialog').close();$('height-0').focus();toast('Quote cleared.');});
