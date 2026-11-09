@@ -12,7 +12,21 @@ Download `EG-Quote-Builder.html` and open it in your browser. This bundled versi
 
 Run `npm run build` to create the static site in `dist/`. Relative asset paths support subdirectory hosting.
 
-For a persistent live site, import `luisegproductions-dotcom/quote_builder` in Netlify and select branch `main`. The included `netlify.toml` sets build command `npm run build` and publish directory `dist`. Netlify will provide the live URL and deploy future pushes. This requires authorizing Netlify to access the private repository. `.netlify/` is ignored so local linking metadata is never committed. No site has been deployed from this workspace yet.
+## GitHub Pages
+
+This app publishes directly from `main` at `/(root)`; no build or external hosting service is needed. `.nojekyll` tells Pages to serve the files as plain static assets.
+
+One-time setup in the repository's **Settings → Pages**:
+
+1. Set Source to **Deploy from a branch**.
+2. Select **main** and **/(root)**.
+3. Click **Save** and wait for GitHub's Pages deployment to complete.
+
+Expected URL after activation: https://luisegproductions-dotcom.github.io/quote_builder/
+
+Subsequent pushes to `main` automatically update the site. All app assets use relative URLs, so the `/quote_builder/` path works without special routing.
+
+The repository is private. GitHub Pages for private repositories requires an eligible GitHub plan. Keep the repository private unless its owner explicitly chooses otherwise.
 
 ## Features
 
