@@ -22,7 +22,7 @@ One-time setup in the repository's **Settings → Pages**:
 2. Select **main** and **/(root)**.
 3. Click **Save** and wait for GitHub's Pages deployment to complete.
 
-Expected URL after activation: https://luisegproductions-dotcom.github.io/quote_builder/
+Live URL: https://luisegproductions-dotcom.github.io/quote_builder/
 
 Subsequent pushes to `main` automatically update the site. All app assets use relative URLs, so the `/quote_builder/` path works without special routing.
 
@@ -43,8 +43,14 @@ Reviewed source: https://github.com/ivanvelascoklee-web/cotizador-EG/blob/main/i
 
 Calculation: convert dimensions using exactly 25.4 mm/in, round individual billable area to 2 decimals, multiply by quantity and round, multiply by rate and round, then sum subtotals and round. No tax, installation, markup, minimum charge, or other fees are invented. Invalid/incomplete panels block copying and printing a final quote.
 
-Design uses the source calculator's black/white palette and multicolor accent. The main company website could not be reached from the execution environment (HTTP proxy 403), so exact website styling and its logo remain to be verified. The header is a typographic company wordmark, not a downloaded official logo.
+## Verified company design
+
+Inspected the live company website and its stylesheet on November 10, 2026. The app uses its official white EG Productions & Signs logo, navy (#020912) background, blue (#31a7ff) accents, thin blue borders, subtle glow, uppercase display headings, and compact rectangular buttons. The company declares Impact/Haettenschweiler/Arial Narrow Bold with a sans-serif fallback for display type and Arial/Helvetica for body copy; this app uses the same stacks. Desktop includes its illuminated Balmain sign image; phones prioritize the product buttons and quoting fields. Print output stays white with a black logo.
+
+Assets in `assets/` come from the company's `/assets/eg-logo-transparent.png` and `/assets/hero-balmain.png`. They are served locally and embedded in the standalone HTML, so quoting works offline without loading third-party assets.
+
+Rechecked the original live calculator (v2.4.1) directly. All six units, both billing bases, zero-dollar rates, multiple sizes, quantities, and per-panel rounding are retained. Deliberate differences: English/USD only, product selection, automatic dimension conversion when switching units, confirmation before clearing, and blocking final exports if any panel is incomplete or invalid. Clear retains the current measurement and billing units; the original resets those units. No product-specific rates exist in the original or this app.
 
 ## Browser verification
 
-`node tests/browser.cjs` uses Playwright when available, against the local server on port 5173. Covers mobile widths, product selection, multiple panels, unit conversion, invalid-input blocking, clearing, copying, and print layout. Screenshots go to `/tmp/eg-quote-*.png`.
+`node tests/browser.cjs` uses Playwright when available, against the local server on port 5173. Covers mobile widths, product selection, multiple panels, unit conversion, invalid-input blocking, clearing, copying, and print layout. Screenshots go to `/tmp/eg-quote-*.png`. Set `APP_URL` to test the deployed Pages URL with the same suite. `node tests/parity.cjs` compares the live original calculator against the pricing engine for all six units and both billing bases.
