@@ -18,16 +18,16 @@ try {
  const saved = JSON.parse(localStorage.getItem(priceStorageKey) || '{}');
  for (const [id] of products) {
   const p = saved?.[id];
-  if (p && typeof p.rate === 'string' && p.rate.trim() !== '' && Number.isFinite(Number(p.rate)) && Number(p.rate) >= 0 && ['in2','ft2'].includes(p.basis)) defaults[id] = {rate:p.rate, basis:p.basis};
+  if (p && typeof p.rate === 'string' && p.rate.trim() !== '' && Number.isFinite(Number(p.rate)) && Number(p.rate) >= 0) defaults[id] = {rate:p.rate};
  }
 } catch { /* Quoting remains available when browser storage is unavailable. */ }
 let customPrice = false;
 function applyDefaultPrice(){
  const price = defaults[state.product];
- state.rate = price?.rate ?? ''; state.basis = price?.basis ?? 'in2'; customPrice = false;
+ state.rate = price?.rate ?? ''; customPrice = false;
 }
 function renderPriceMode(){
- $('basis').disabled = !customPrice; $('rate').disabled = !customPrice;
+ $('basis').disabled = false; $('rate').disabled = !customPrice;
  $('customize-price').hidden = customPrice;
  $('customize-price').setAttribute('aria-expanded', String(customPrice));
  $('reset-price').hidden = !customPrice;
@@ -40,8 +40,8 @@ $('open-settings').addEventListener('click',()=>{
  $('choose').hidden=true; $('settings').hidden=false;
  $('settings-status').textContent='';
  $('settings-products').innerHTML=products.map(([id,name])=>{
- const p=defaults[id] || {rate:'',basis:'in2'};
- return `<section class="card"><h2>${name}</h2><div class="price-fields"><div><label for="default-basis-${id}">Charge by</label><select id="default-basis-${id}"><option value="in2" ${p.basis==='in2'?'selected':''}>Square inch (in²)</option><option value="ft2" ${p.basis==='ft2'?'selected':''}>Square foot (ft²)</option></select></div><div><label for="default-rate-${id}">Default price (USD)</label><input id="default-rate-${id}" type="number" min="0" step="any" inputmode="decimal" placeholder="Not set" value="${escape(p.rate)}"></div></div></section>`;
+ const p=defaults[id] || {rate:''};
+ return `<section class="card"><h2>${name}</h2><label for="default-rate-${id}">Default price (USD)</label><input id="default-rate-${id}" type="number" min="0" step="any" inputmode="decimal" placeholder="Not set" value="${escape(p.rate)}"></section>`;
  }).join('');
  window.scrollTo(0,0); $('settings-title').focus();
 });
@@ -52,7 +52,7 @@ $('settings-form').addEventListener('submit',e=>{
  for(const [id] of products){
   const input=$(`default-rate-${id}`), rate=input.value;
   if(!input.checkValidity() || (rate!=='' && (!Number.isFinite(Number(rate)) || Number(rate)<0))){input.reportValidity();return;}
-  if(rate!=='')next[id]={rate,basis:$(`default-basis-${id}`).value};
+  if(rate!=='')next[id]={rate};
  }
  try { localStorage.setItem(priceStorageKey,JSON.stringify(next)); }
  catch { $('settings-status').textContent='Prices could not be saved. Allow browser storage and try again. You can still customize individual quotes.'; return; }
