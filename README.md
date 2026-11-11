@@ -60,3 +60,5 @@ Rechecked the original live calculator (v2.4.1) directly. All six units, both bi
 Run `node tests/settings.cjs` for saved price defaults, the same saved number for either billing unit, overrides, validation, persistence, and settings layouts. Both browser suites accept `APP_URL` for production verification.
 
 Price settings has one USD field per product. Its numeric value applies unchanged to either in² or ft² on the quote page; rates are not converted. Previously saved rates are retained, and their former billing-unit preference is ignored. Quote-page billing units remain selectable without enabling Customize price.
+
+Each product card has its own right-aligned Save price button. Saving validates and persists only that product and keeps the settings page open. Cancel discards unsaved edits but keeps individually saved prices.

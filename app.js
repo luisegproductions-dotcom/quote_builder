@@ -41,22 +41,27 @@ $('open-settings').addEventListener('click',()=>{
  $('settings-status').textContent='';
  $('settings-products').innerHTML=products.map(([id,name])=>{
  const p=defaults[id] || {rate:''};
- return `<section class="card"><h2>${name}</h2><label for="default-rate-${id}">Default price (USD)</label><input id="default-rate-${id}" type="number" min="0" step="any" inputmode="decimal" placeholder="Not set" value="${escape(p.rate)}"></section>`;
+ return `<form class="card" data-price-product="${id}" aria-label="${name} price"><h2>${name}</h2><label for="default-rate-${id}">Default price (USD)</label><input id="default-rate-${id}" type="number" min="0" step="any" inputmode="decimal" placeholder="Not set" value="${escape(p.rate)}"><div class="product-price-actions"><button class="primary" type="submit">Save price</button></div><p class="price-save-status" role="status"></p></form>`;
  }).join('');
  window.scrollTo(0,0); $('settings-title').focus();
 });
 $('settings-back').addEventListener('click',showHome);
 $('settings-cancel').addEventListener('click',showHome);
 $('settings-form').addEventListener('submit',e=>{
- e.preventDefault(); const next={};
- for(const [id] of products){
-  const input=$(`default-rate-${id}`), rate=input.value;
-  if(!input.checkValidity() || (rate!=='' && (!Number.isFinite(Number(rate)) || Number(rate)<0))){input.reportValidity();return;}
-  if(rate!=='')next[id]={rate};
- }
+ e.preventDefault();
+ const form=e.target.closest('[data-price-product]'); if(!form)return;
+ const id=form.dataset.priceProduct, input=$(`default-rate-${id}`), rate=input.value;
+ const status=form.querySelector('.price-save-status');
+ if(!input.checkValidity() || (rate!=='' && (!Number.isFinite(Number(rate)) || Number(rate)<0))){input.reportValidity();return;}
+ const next={...defaults};
+ if(rate==='')delete next[id]; else next[id]={rate};
  try { localStorage.setItem(priceStorageKey,JSON.stringify(next)); }
- catch { $('settings-status').textContent='Prices could not be saved. Allow browser storage and try again. You can still customize individual quotes.'; return; }
- defaults=next; showHome(); toast('Default prices saved.');
+ catch { status.textContent='Could not save. Allow browser storage and try again.'; return; }
+ defaults=next; status.textContent=rate===''?'Default price removed.':'Price saved.';
+});
+$('settings-products').addEventListener('input',e=>{
+ const form=e.target.closest('[data-price-product]');
+ if(form)form.querySelector('.price-save-status').textContent='';
 });
 $('customize-price').addEventListener('click',()=>{customPrice=true;renderPriceMode();$('rate').focus();});
 $('reset-price').addEventListener('click',()=>{applyDefaultPrice();$('basis').value=state.basis;$('rate').value=state.rate;renderPriceMode();update();});

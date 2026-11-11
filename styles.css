@@ -14,3 +14,5 @@ h2,.product strong{letter-spacing:.02em}.product,.card{background:#061421;border
 @media print{ :root{color-scheme:light}.brand-logo{filter:brightness(0)}.summary{box-shadow:none}.summary:before{display:none}}
 
 .settings-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.settings-products .card{margin:0}.settings-products h2{margin-bottom:22px}.settings-actions{display:flex;justify-content:flex-end;gap:12px;margin:24px 0 40px}input:disabled,select:disabled{opacity:1;color:var(--muted);cursor:default}#reset-price{margin:0 0 18px}#settings-status{line-height:1.5;color:#ff9b9b}#settings-title:focus{outline:none}@media(max-width:700px){.settings-products{grid-template-columns:1fr}#choose>.section-heading{align-items:flex-start;flex-wrap:wrap}}@media print{#settings{display:none!important}}
+
+.product-price-actions{display:flex;justify-content:flex-end;margin-top:18px}.price-save-status{font-size:12px;line-height:1.5;color:var(--muted);margin:10px 0 0}.price-save-status:empty{display:none}
