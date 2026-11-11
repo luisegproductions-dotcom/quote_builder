@@ -35,7 +35,9 @@ The repository is private. GitHub Pages for private repositories requires an eli
 - Inches/metric switch with automatic dimension conversion; retains all original input units (in, ft, yd, mm, cm, m).
 - Manually entered USD rates per in² or ft², copy quote, print/save PDF, and confirmed clearing.
 - Changing the billing unit keeps the numerical rate, matching the original calculator. Review the rate when changing billing units.
-- No saved quotes, user accounts, server storage, or shared history. Reloading clears the quote.
+- Price settings on the home page stores a rate and billing unit for each product in this browser’s local storage. No rates are supplied automatically. Blank settings remove a default; zero is valid.
+- Each product opens with its saved default. Customize price enables a quote-only override; Use default price and Clear quote restore the saved default. Returning to a product also restores its default.
+- No saved quotes, user accounts, server storage, or shared history. Reloading clears the quote, but saved default prices remain in this browser. Settings do not sync across devices; standalone-file storage depends on the browser.
 
 ## Pricing source and verification
 
@@ -49,8 +51,10 @@ Inspected the live company website and its stylesheet on November 10, 2026. The 
 
 Assets in `assets/` come from the company's `/assets/eg-logo-transparent.png` and `/assets/hero-balmain.png`. They are served locally and embedded in the standalone HTML, so quoting works offline without loading third-party assets.
 
-Rechecked the original live calculator (v2.4.1) directly. All six units, both billing bases, zero-dollar rates, multiple sizes, quantities, and per-panel rounding are retained. Deliberate differences: English/USD only, product selection, automatic dimension conversion when switching units, confirmation before clearing, and blocking final exports if any panel is incomplete or invalid. Clear retains the current measurement and billing units; the original resets those units. No product-specific rates exist in the original or this app.
+Rechecked the original live calculator (v2.4.1) directly. All six units, both billing bases, zero-dollar rates, multiple sizes, quantities, and per-panel rounding are retained. Deliberate differences: English/USD only, product selection, automatic dimension conversion when switching units, confirmation before clearing, and blocking final exports if any panel is incomplete or invalid. Clear retains the measurement unit and restores the selected product’s saved default price and billing unit; the original resets units. No product-specific rates exist in the original or this app.
 
 ## Browser verification
 
 `node tests/browser.cjs` uses Playwright when available, against the local server on port 5173. Covers mobile widths, product selection, multiple panels, unit conversion, invalid-input blocking, clearing, copying, and print layout. Screenshots go to `/tmp/eg-quote-*.png`. Set `APP_URL` to test the deployed Pages URL with the same suite. `node tests/parity.cjs` compares the live original calculator against the pricing engine for all six units and both billing bases.
+
+Run `node tests/settings.cjs` for saved price defaults, product-specific billing units, overrides, validation, persistence, and settings layouts. Both browser suites accept `APP_URL` for production verification.

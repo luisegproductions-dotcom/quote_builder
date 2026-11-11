@@ -12,6 +12,54 @@ const products = [
 ];
 const blankPanel = () => ({height:'',width:'',quantity:'1'});
 let state = { product:null, unit:'in', basis:'in2', rate:'', panels:[blankPanel()] };
+const priceStorageKey = 'eg-quote-builder.product-prices.v1';
+let defaults = {};
+try {
+ const saved = JSON.parse(localStorage.getItem(priceStorageKey) || '{}');
+ for (const [id] of products) {
+  const p = saved?.[id];
+  if (p && typeof p.rate === 'string' && p.rate.trim() !== '' && Number.isFinite(Number(p.rate)) && Number(p.rate) >= 0 && ['in2','ft2'].includes(p.basis)) defaults[id] = {rate:p.rate, basis:p.basis};
+ }
+} catch { /* Quoting remains available when browser storage is unavailable. */ }
+let customPrice = false;
+function applyDefaultPrice(){
+ const price = defaults[state.product];
+ state.rate = price?.rate ?? ''; state.basis = price?.basis ?? 'in2'; customPrice = false;
+}
+function renderPriceMode(){
+ $('basis').disabled = !customPrice; $('rate').disabled = !customPrice;
+ $('customize-price').hidden = customPrice;
+ $('customize-price').setAttribute('aria-expanded', String(customPrice));
+ $('reset-price').hidden = !customPrice;
+ $('price-source').textContent = customPrice ? 'Custom price for this quote only. Saved defaults stay unchanged.' : defaults[state.product] ? 'Using this product’s saved default price.' : 'No default price saved. Customize the price for this quote or set one in Price settings.';
+}
+function showHome(){
+ $('choose').hidden=false; $('settings').hidden=true; $('builder').hidden=true; $('mobile-total').hidden=true; window.scrollTo(0,0);
+}
+$('open-settings').addEventListener('click',()=>{
+ $('choose').hidden=true; $('settings').hidden=false;
+ $('settings-status').textContent='';
+ $('settings-products').innerHTML=products.map(([id,name])=>{
+ const p=defaults[id] || {rate:'',basis:'in2'};
+ return `<section class="card"><h2>${name}</h2><div class="price-fields"><div><label for="default-basis-${id}">Charge by</label><select id="default-basis-${id}"><option value="in2" ${p.basis==='in2'?'selected':''}>Square inch (in²)</option><option value="ft2" ${p.basis==='ft2'?'selected':''}>Square foot (ft²)</option></select></div><div><label for="default-rate-${id}">Default price (USD)</label><input id="default-rate-${id}" type="number" min="0" step="any" inputmode="decimal" placeholder="Not set" value="${escape(p.rate)}"></div></div></section>`;
+ }).join('');
+ window.scrollTo(0,0); $('settings-title').focus();
+});
+$('settings-back').addEventListener('click',showHome);
+$('settings-cancel').addEventListener('click',showHome);
+$('settings-form').addEventListener('submit',e=>{
+ e.preventDefault(); const next={};
+ for(const [id] of products){
+  const input=$(`default-rate-${id}`), rate=input.value;
+  if(!input.checkValidity() || (rate!=='' && (!Number.isFinite(Number(rate)) || Number(rate)<0))){input.reportValidity();return;}
+  if(rate!=='')next[id]={rate,basis:$(`default-basis-${id}`).value};
+ }
+ try { localStorage.setItem(priceStorageKey,JSON.stringify(next)); }
+ catch { $('settings-status').textContent='Prices could not be saved. Allow browser storage and try again. You can still customize individual quotes.'; return; }
+ defaults=next; showHome(); toast('Default prices saved.');
+});
+$('customize-price').addEventListener('click',()=>{customPrice=true;renderPriceMode();$('rate').focus();});
+$('reset-price').addEventListener('click',()=>{applyDefaultPrice();$('basis').value=state.basis;$('rate').value=state.rate;renderPriceMode();update();});
 const labels = {in:'Inches (in)',ft:'Feet (ft)',yd:'Yards (yd)',mm:'Millimeters (mm)',cm:'Centimeters (cm)',m:'Meters (m)'};
 const usd = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
 const num = n => new Intl.NumberFormat('en-US',{maximumFractionDigits:2,minimumFractionDigits:2}).format(n);
@@ -19,12 +67,12 @@ const escape = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 const areaUnit = () => state.basis==='ft2'?'ft²':'in²';
 let quoteText = '';
 $('products').innerHTML = products.map(([id,name,tag,icon])=>`<button class="product" data-product="${id}"><span class="icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icon}</svg></span><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></svg></span><strong>${name}</strong><small>${tag}</small></button>`).join('');
-$('products').addEventListener('click',e=>{const b=e.target.closest('[data-product]');if(!b)return; state.product=b.dataset.product;openBuilder();});
+$('products').addEventListener('click',e=>{const b=e.target.closest('[data-product]');if(!b)return; state.product=b.dataset.product;applyDefaultPrice();openBuilder();});
 function openBuilder(){
  const product=products.find(p=>p[0]===state.product);
  $('choose').hidden=true;$('builder').hidden=false;$('mobile-total').hidden=false;
  $('product-title').textContent=product[1];$('product-description').textContent=product[4];$('summary-product').textContent=product[1];
- renderUnits();renderPanels();$('basis').value=state.basis;$('rate').value=state.rate;update();window.scrollTo(0,0);
+ renderPriceMode();renderUnits();renderPanels();$('basis').value=state.basis;$('rate').value=state.rate;update();window.scrollTo(0,0);
 }
 function renderUnits(){
  const metric=['mm','cm','m'].includes(state.unit);
@@ -70,7 +118,7 @@ $('unit').addEventListener('change',e=>setUnit(e.target.value));
 document.querySelectorAll('[data-system]').forEach(b=>b.addEventListener('click',()=>{if(b.getAttribute('aria-pressed')==='true')return;setUnit(b.dataset.system==='metric'?'mm':'in');}));
 $('rate').addEventListener('input',e=>{state.rate=e.target.value;update();});
 $('basis').addEventListener('change',e=>{state.basis=e.target.value;update();});
-$('back').addEventListener('click',()=>{$('choose').hidden=false;$('builder').hidden=true;$('mobile-total').hidden=true;window.scrollTo(0,0);});
+$('back').addEventListener('click',showHome);
 $('view-quote').addEventListener('click',()=>$('summary').scrollIntoView({behavior:'smooth'}));
 function toast(message){$('toast').textContent=message;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').textContent='',4000);}
 $('copy').addEventListener('click',async()=>{
@@ -81,4 +129,4 @@ $('copy').addEventListener('click',async()=>{
 $('print').addEventListener('click',()=>{if(quoteText)window.print();});
 $('clear').addEventListener('click',()=>$('clear-dialog').showModal());
 $('cancel-clear').addEventListener('click',()=>$('clear-dialog').close());
-$('confirm-clear').addEventListener('click',()=>{state.panels=[blankPanel()];state.rate='';$('rate').value='';renderPanels();update();$('clear-dialog').close();$('height-0').focus();toast('Quote cleared.');});
+$('confirm-clear').addEventListener('click',()=>{state.panels=[blankPanel()];applyDefaultPrice();$('rate').value=state.rate;$('basis').value=state.basis;renderPriceMode();renderPanels();update();$('clear-dialog').close();$('height-0').focus();toast('Quote cleared.');});
