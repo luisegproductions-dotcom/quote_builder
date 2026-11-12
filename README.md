@@ -1,6 +1,6 @@
 # EG Signs Solutions · Quote Builder
 
-Mobile-first quoting app. English, USD, no individual app accounts. Hosted on GitHub Pages, with an optional Google Sheets + Apps Script service for shared prices.
+Mobile-first quoting app. English, USD, no individual app accounts. Hosted on GitHub Pages, with Google Sheets + Apps Script for shared prices.
 
 ## Open without a server
 
@@ -35,9 +35,9 @@ The repository is private. GitHub Pages for private repositories requires an eli
 - Inches/metric switch with automatic dimension conversion; retains all original input units (in, ft, yd, mm, cm, m).
 - Manually entered USD rates per in² or ft², copy quote, print/save PDF, and confirmed clearing.
 - Changing the billing unit keeps the numerical rate, matching the original calculator. Review the rate when changing billing units.
-- Price settings on the home page stores one rate for each product in this browser’s local storage. No rates are supplied automatically. Blank settings remove a default; zero is valid.
+- Price settings on the home page stores one shared rate for each product in Google Sheets. No rates are supplied automatically. Blank settings remove a default; zero is valid.
 - Each product opens with its saved default. Customize price enables a quote-only override; Use default price and Clear quote restore the saved default. Returning to a product also restores its default.
-- No saved quotes, user accounts, server storage, or shared history. Reloading clears the quote, but saved default prices remain in this browser. Settings do not sync across devices; standalone-file storage depends on the browser.
+- No saved quote history or individual app accounts. Reloading clears the quote; shared default prices remain in Google Sheets and are loaded across devices. Internet access is required for shared defaults and saves.
 
 ## Pricing source and verification
 
@@ -63,10 +63,10 @@ Price settings has one USD field per product. Its numeric value applies unchange
 
 Each product card has its own right-aligned Save price button. Saving validates and persists only that product and keeps the settings page open. Cancel discards unsaved edits but keeps individually saved prices.
 
-## Google Sheets shared prices (activation pending)
+## Google Sheets shared prices (active)
 
-The integration and service source are prepared. `price-config.js` intentionally has an empty deployment URL until the Google account owner completes [Google setup](google-apps-script/SETUP.md). Until then, the existing browser-only defaults remain active and the app labels them as such.
+`price-config.js` points to the deployed Google Apps Script service. Google Sheets is now the source of shared defaults. Browser-only defaults are ignored and are not silently migrated. The sheet initially contains eight blank rates; staff enter verified prices using their private edit key. [Google setup and key management](google-apps-script/SETUP.md).
 
 After activation, each product/settings opening fetches fresh shared defaults; quote overrides never write to the sheet. A shared staff key is requested when saving and retained only in memory. No Google credentials or edit key are shipped to GitHub Pages. Reads are public, writes validated, and conflicting in-app saves rejected. An unconfirmed request is reported as an error, never silently treated as a successful shared save. Existing browser defaults are not automatically uploaded: enter verified prices after setup.
 
-`node tests/shared-prices.cjs` exercises two isolated browser users against a mocked service. `npm test` also validates the Apps Script handler using mocked Google APIs. Actual Google deployment, cross-origin requests, authorization, and live persistence must still be verified after the web-app URL is configured.
+`node tests/shared-prices.cjs` exercises two isolated browser users against a mocked service. `npm test` also validates the Apps Script handler using mocked Google APIs. Live Google reads and cross-origin POST responses have been verified; unauthorized writes are rejected. An authorized live write still requires a staff member to enter the private EDIT_KEY in the app. `node tests/shared-live.cjs` performs non-mutating live connectivity checks.

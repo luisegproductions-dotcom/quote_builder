@@ -53,9 +53,8 @@ h2,.product strong{letter-spacing:.02em}.product,.card{background:#061421;border
 </main><div class="mobile-total" id="mobile-total" hidden><div><span>Estimated total · USD</span><strong id="mobile-amount">—</strong></div><button id="view-quote">View quote ↓</button></div><div id="toast" role="status" aria-live="polite"></div>
 <dialog id="clear-dialog"><h2>Clear this quote?</h2><p>Your measurements and custom price will be removed. Your saved default price will be restored.</p><div class="dialog-actions"><button id="cancel-clear" class="secondary">Keep editing</button><button id="confirm-clear" class="primary">Clear quote</button></div></dialog>
 <dialog id="staff-key-dialog"><form method="dialog"><h2>Save shared price</h2><p>Enter your staff edit key. It stays in memory until you close or reload this page.</p><label for="staff-key">Staff edit key</label><input id="staff-key" type="password" autocomplete="off"><div class="dialog-actions"><button class="secondary" value="cancel">Cancel</button><button class="primary" value="save">Save price</button></div></form></dialog>
-<script>// Public Apps Script deployment URL only. Never put the staff EDIT_KEY here.
-// Empty until the Google account owner deploys google-apps-script/Code.gs.
-window.EG_PRICE_SERVICE_URL = '';
+<script>// Public Apps Script deployment URL. Staff edit keys are never embedded here.
+window.EG_PRICE_SERVICE_URL = 'https://script.google.com/macros/s/AKfycby65vFMP2wxE-Z68ATy2qpqlosworiedwyjMbdJL-NBBJlNBkrCk95tfwDg_CEFNUTFgw/exec';
 </script><script>
 // Matches cotizador-EG v2.4.1: round each panel's billable area before
 // multiplying by quantity, then round each subtotal before summing.

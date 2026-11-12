@@ -5,6 +5,8 @@ const assert=require('node:assert/strict');
  try{
  const page=await browser.newPage({viewport:{width:390,height:844}});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ // Exercise the retained local fallback in isolation, never write real shared prices.
+ await page.route('**/price-config.js*',r=>r.fulfill({contentType:'application/javascript',body:"window.EG_PRICE_SERVICE_URL='';"}));
  await page.goto(process.env.APP_URL || 'http://localhost:5173');
  await page.locator('#open-settings').click();
  const ids=['channel','reverse','coroplastic','banner','wall','full-wrap','semi-wrap','window'];
