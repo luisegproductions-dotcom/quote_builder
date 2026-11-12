@@ -31,8 +31,10 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  await save(c,'8','test-staff-key');await c.getByText(/Another user changed this price/).waitFor();assert.equal(prices.channel.rate,'5');
  await c.locator('#settings-cancel').click();await c.locator('[data-product=channel]').click();await c.locator('#builder').waitFor({state:'visible'});assert.equal(await c.locator('#rate').inputValue(),'5');
  await c.locator('#customize-price').click();await c.locator('#rate').fill('99');assert.equal(prices.channel.rate,'5');
+ await a.reload();await a.locator('#open-settings').click();await a.locator('[data-price-product=channel]').waitFor();assert(await a.locator('#forget-staff-key').isVisible());
  await save(a,'','');await a.getByText('Shared default removed.',{exact:true}).waitFor();assert.equal(prices.channel.rate,'');
- fail=true;await save(a,'12','');await a.locator('[data-price-product=channel] .price-save-status').filter({hasText:/fetch|confirmed|network/i}).waitFor();assert.equal(prices.channel.rate,'');
+ await a.locator('#forget-staff-key').click();assert(await a.locator('#forget-staff-key').isHidden());await save(a,'4','test-staff-key');await a.getByText('Price saved for everyone.',{exact:true}).waitFor();
+ fail=true;await save(a,'12','');await a.locator('[data-price-product=channel] .price-save-status').filter({hasText:/fetch|confirmed|network/i}).waitFor();assert.equal(prices.channel.rate,'4');
  console.log('Shared price UI: two separate browser users, confirmed save/read, wrong key, conflict, removal, quote-only override, and network failure passed (mock service).');
  }finally{await b.close();}
 })().catch(e=>{console.error(e);process.exit(1)});

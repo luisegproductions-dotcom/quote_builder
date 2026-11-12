@@ -13,7 +13,16 @@ const products = [
 const blankPanel = () => ({height:'',width:'',quantity:'1'});
 let state = { product:null, unit:'in', basis:'in2', rate:'', panels:[blankPanel()] };
 const sharedPriceUrl = window.EG_PRICE_SERVICE_URL || '';
+const staffKeyStorageKey = 'eg-quote-builder.staff-key:' + sharedPriceUrl;
 let staffEditKey = '';
+try { if(sharedPriceUrl)staffEditKey=localStorage.getItem(staffKeyStorageKey) || ''; } catch {}
+function rememberStaffKey(key){
+ staffEditKey=key;
+ try { if(key)localStorage.setItem(staffKeyStorageKey,key);else localStorage.removeItem(staffKeyStorageKey); } catch {}
+ $('forget-staff-key').hidden=!sharedPriceUrl || !staffEditKey;
+}
+$('forget-staff-key').hidden=!sharedPriceUrl || !staffEditKey;
+$('forget-staff-key').addEventListener('click',()=>{rememberStaffKey('');toast('Saved key forgotten on this device.');});
 const priceStorageKey = 'eg-quote-builder.product-prices.v1';
 let defaults = {};
 try {
@@ -31,7 +40,7 @@ async function priceRequest(payload){
  });
  if(!response.ok)throw new Error('Shared prices are unavailable. Try again.');
  const data=await response.json();
- if(!data.ok){if(data.code==='unauthorized')staffEditKey='';throw new Error(data.error || 'Could not access shared prices.');}
+ if(!data.ok){if(data.code==='unauthorized')rememberStaffKey('');throw new Error(data.error || 'Could not access shared prices.');}
  const next={};
  for(const [id] of products){
   const rate=data.prices?.[id]?.rate;
@@ -95,7 +104,7 @@ $('settings-form').addEventListener('submit',async e=>{
    const next=await priceRequest({product:id,rate,expectedRate:defaults[id]?.rate ?? '',key});
    // Other cards may contain unsaved edits: only update this card's baseline.
    if(next[id])defaults[id]=next[id];else delete defaults[id];
-   staffEditKey=key;status.textContent=rate===''?'Shared default removed.':'Price saved for everyone.';
+   rememberStaffKey(key);status.textContent=rate===''?'Shared default removed.':'Price saved for everyone.';
   }catch(e){status.textContent=e.message || 'Save not confirmed. Reopen Price settings to check before retrying.';}
   finally{button.disabled=false;input.disabled=false;}
  }else{

@@ -35,7 +35,7 @@ h2,.product strong{letter-spacing:.02em}.product,.card{background:#061421;border
 <button class="back" id="settings-back">← All products</button>
 <div class="builder-heading"><div><h1 tabindex="-1" id="settings-title">Price settings</h1><p>Set a default rate for each product or service.</p></div></div>
 <p id="settings-help" class="hint">Save each product individually. Cancel discards unsaved edits; saved prices stay saved in this browser. Leave a price blank to remove its default. The same USD price applies per in² or per ft², as selected on the quote page. No taxes or fees are added.</p>
-<div id="settings-form"><div id="settings-products" class="settings-products"></div><p id="settings-status" role="status"></p><div class="settings-actions"><button class="secondary" type="button" id="settings-cancel">Cancel</button></div></div>
+<div id="settings-form"><div id="settings-products" class="settings-products"></div><p id="settings-status" role="status"></p><div class="settings-actions"><button class="secondary" type="button" id="forget-staff-key" hidden>Forget saved key</button><button class="secondary" type="button" id="settings-cancel">Cancel</button></div></div>
 </section>
 <section id="builder" hidden>
 <button class="back" id="back">← All products</button>
@@ -52,7 +52,7 @@ h2,.product strong{letter-spacing:.02em}.product,.card{background:#061421;border
 <footer><span>EG SIGNS SOLUTIONS</span><span>Quote builder <span class="dot">/</span> v1.0</span></footer>
 </main><div class="mobile-total" id="mobile-total" hidden><div><span>Estimated total · USD</span><strong id="mobile-amount">—</strong></div><button id="view-quote">View quote ↓</button></div><div id="toast" role="status" aria-live="polite"></div>
 <dialog id="clear-dialog"><h2>Clear this quote?</h2><p>Your measurements and custom price will be removed. Your saved default price will be restored.</p><div class="dialog-actions"><button id="cancel-clear" class="secondary">Keep editing</button><button id="confirm-clear" class="primary">Clear quote</button></div></dialog>
-<dialog id="staff-key-dialog"><form method="dialog"><h2>Save shared price</h2><p>Enter your staff edit key. It stays in memory until you close or reload this page.</p><label for="staff-key">Staff edit key</label><input id="staff-key" type="password" autocomplete="off"><div class="dialog-actions"><button class="secondary" value="cancel">Cancel</button><button class="primary" value="save">Save price</button></div></form></dialog>
+<dialog id="staff-key-dialog"><form method="dialog"><h2>Save shared price</h2><p>Enter your staff edit key once. After a successful save, this browser will remember it. Use “Forget saved key” on shared devices.</p><label for="staff-key">Staff edit key</label><input id="staff-key" type="password" autocomplete="off"><div class="dialog-actions"><button class="secondary" value="cancel">Cancel</button><button class="primary" value="save">Save price</button></div></form></dialog>
 <script>// Public Apps Script deployment URL. Staff edit keys are never embedded here.
 window.EG_PRICE_SERVICE_URL = 'https://script.google.com/macros/s/AKfycby65vFMP2wxE-Z68ATy2qpqlosworiedwyjMbdJL-NBBJlNBkrCk95tfwDg_CEFNUTFgw/exec';
 </script><script>
@@ -101,7 +101,16 @@ const products = [
 const blankPanel = () => ({height:'',width:'',quantity:'1'});
 let state = { product:null, unit:'in', basis:'in2', rate:'', panels:[blankPanel()] };
 const sharedPriceUrl = window.EG_PRICE_SERVICE_URL || '';
+const staffKeyStorageKey = 'eg-quote-builder.staff-key:' + sharedPriceUrl;
 let staffEditKey = '';
+try { if(sharedPriceUrl)staffEditKey=localStorage.getItem(staffKeyStorageKey) || ''; } catch {}
+function rememberStaffKey(key){
+ staffEditKey=key;
+ try { if(key)localStorage.setItem(staffKeyStorageKey,key);else localStorage.removeItem(staffKeyStorageKey); } catch {}
+ $('forget-staff-key').hidden=!sharedPriceUrl || !staffEditKey;
+}
+$('forget-staff-key').hidden=!sharedPriceUrl || !staffEditKey;
+$('forget-staff-key').addEventListener('click',()=>{rememberStaffKey('');toast('Saved key forgotten on this device.');});
 const priceStorageKey = 'eg-quote-builder.product-prices.v1';
 let defaults = {};
 try {
@@ -119,7 +128,7 @@ async function priceRequest(payload){
  });
  if(!response.ok)throw new Error('Shared prices are unavailable. Try again.');
  const data=await response.json();
- if(!data.ok){if(data.code==='unauthorized')staffEditKey='';throw new Error(data.error || 'Could not access shared prices.');}
+ if(!data.ok){if(data.code==='unauthorized')rememberStaffKey('');throw new Error(data.error || 'Could not access shared prices.');}
  const next={};
  for(const [id] of products){
   const rate=data.prices?.[id]?.rate;
@@ -183,7 +192,7 @@ $('settings-form').addEventListener('submit',async e=>{
    const next=await priceRequest({product:id,rate,expectedRate:defaults[id]?.rate ?? '',key});
    // Other cards may contain unsaved edits: only update this card's baseline.
    if(next[id])defaults[id]=next[id];else delete defaults[id];
-   staffEditKey=key;status.textContent=rate===''?'Shared default removed.':'Price saved for everyone.';
+   rememberStaffKey(key);status.textContent=rate===''?'Shared default removed.':'Price saved for everyone.';
   }catch(e){status.textContent=e.message || 'Save not confirmed. Reopen Price settings to check before retrying.';}
   finally{button.disabled=false;input.disabled=false;}
  }else{
