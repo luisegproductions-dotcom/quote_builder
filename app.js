@@ -12,15 +12,45 @@ const products = [
 ];
 const blankPanel = () => ({height:'',width:'',quantity:'1'});
 let state = { product:null, unit:'in', basis:'in2', rate:'', panels:[blankPanel()] };
+const sharedPriceUrl = window.EG_PRICE_SERVICE_URL || '';
+let staffEditKey = '';
 const priceStorageKey = 'eg-quote-builder.product-prices.v1';
 let defaults = {};
 try {
- const saved = JSON.parse(localStorage.getItem(priceStorageKey) || '{}');
+ const saved = sharedPriceUrl ? {} : JSON.parse(localStorage.getItem(priceStorageKey) || '{}');
  for (const [id] of products) {
   const p = saved?.[id];
   if (p && typeof p.rate === 'string' && p.rate.trim() !== '' && Number.isFinite(Number(p.rate)) && Number(p.rate) >= 0) defaults[id] = {rate:p.rate};
  }
 } catch { /* Quoting remains available when browser storage is unavailable. */ }
+async function priceRequest(payload){
+ const response=await fetch(sharedPriceUrl,{
+  method:payload?'POST':'GET', credentials:'omit', redirect:'follow', cache:'no-store',
+  ...(payload?{headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}:{}),
+  signal:AbortSignal.timeout(20000)
+ });
+ if(!response.ok)throw new Error('Shared prices are unavailable. Try again.');
+ const data=await response.json();
+ if(!data.ok){if(data.code==='unauthorized')staffEditKey='';throw new Error(data.error || 'Could not access shared prices.');}
+ const next={};
+ for(const [id] of products){
+  const rate=data.prices?.[id]?.rate;
+  if(typeof rate!=='string' || (rate!=='' && (!Number.isFinite(Number(rate)) || Number(rate)<0)))throw new Error('The shared price list is invalid.');
+  if(rate!=='')next[id]={rate};
+ }
+ return next;
+}
+function requestEditKey(){
+ if(staffEditKey)return Promise.resolve(staffEditKey);
+ return new Promise(resolve=>{
+  $('staff-key').value='';
+  $('staff-key-dialog').addEventListener('close',()=>{
+   const key=$('staff-key-dialog').returnValue==='save'?$('staff-key').value:'';
+   $('staff-key').value='';resolve(key);
+  },{once:true});
+  $('staff-key-dialog').showModal();
+ });
+}
 let customPrice = false;
 function applyDefaultPrice(){
  const price = defaults[state.product];
@@ -36,9 +66,14 @@ function renderPriceMode(){
 function showHome(){
  $('choose').hidden=false; $('settings').hidden=true; $('builder').hidden=true; $('mobile-total').hidden=true; window.scrollTo(0,0);
 }
-$('open-settings').addEventListener('click',()=>{
+$('open-settings').addEventListener('click',async()=>{
  $('choose').hidden=true; $('settings').hidden=false;
  $('settings-status').textContent='';
+ if(sharedPriceUrl){
+  $('settings-products').innerHTML='';$('settings-status').textContent='Loading shared prices…';
+  try{defaults=await priceRequest();$('settings-status').textContent='';}
+  catch(e){$('settings-status').textContent='Could not load shared prices. Return to products and try again.';return;}
+ }
  $('settings-products').innerHTML=products.map(([id,name])=>{
  const p=defaults[id] || {rate:''};
  return `<form class="card" data-price-product="${id}" aria-label="${name} price"><h2>${name}</h2><label for="default-rate-${id}">Default price (USD)</label><input id="default-rate-${id}" type="number" min="0" step="any" inputmode="decimal" placeholder="Not set" value="${escape(p.rate)}"><div class="product-price-actions"><button class="primary" type="submit">Save price</button></div><p class="price-save-status" role="status"></p></form>`;
@@ -47,17 +82,28 @@ $('open-settings').addEventListener('click',()=>{
 });
 $('settings-back').addEventListener('click',showHome);
 $('settings-cancel').addEventListener('click',showHome);
-$('settings-form').addEventListener('submit',e=>{
+$('settings-form').addEventListener('submit',async e=>{
  e.preventDefault();
  const form=e.target.closest('[data-price-product]'); if(!form)return;
  const id=form.dataset.priceProduct, input=$(`default-rate-${id}`), rate=input.value;
  const status=form.querySelector('.price-save-status');
  if(!input.checkValidity() || (rate!=='' && (!Number.isFinite(Number(rate)) || Number(rate)<0))){input.reportValidity();return;}
- const next={...defaults};
- if(rate==='')delete next[id]; else next[id]={rate};
- try { localStorage.setItem(priceStorageKey,JSON.stringify(next)); }
- catch { status.textContent='Could not save. Allow browser storage and try again.'; return; }
- defaults=next; status.textContent=rate===''?'Default price removed.':'Price saved.';
+ if(sharedPriceUrl){
+  const button=form.querySelector('button');button.disabled=true;input.disabled=true;status.textContent='Saving…';
+  try{
+   const key=await requestEditKey();if(!key){status.textContent='Save canceled.';return;}
+   const next=await priceRequest({product:id,rate,expectedRate:defaults[id]?.rate ?? '',key});
+   // Other cards may contain unsaved edits: only update this card's baseline.
+   if(next[id])defaults[id]=next[id];else delete defaults[id];
+   staffEditKey=key;status.textContent=rate===''?'Shared default removed.':'Price saved for everyone.';
+  }catch(e){status.textContent=e.message || 'Save not confirmed. Reopen Price settings to check before retrying.';}
+  finally{button.disabled=false;input.disabled=false;}
+ }else{
+  const next={...defaults};if(rate==='')delete next[id];else next[id]={rate};
+  try { localStorage.setItem(priceStorageKey,JSON.stringify(next)); }
+  catch { status.textContent='Could not save. Allow browser storage and try again.'; return; }
+  defaults=next; status.textContent=rate===''?'Default price removed.':'Price saved.';
+ }
 });
 $('settings-products').addEventListener('input',e=>{
  const form=e.target.closest('[data-price-product]');
@@ -72,7 +118,15 @@ const escape = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 const areaUnit = () => state.basis==='ft2'?'ft²':'in²';
 let quoteText = '';
 $('products').innerHTML = products.map(([id,name,tag,icon])=>`<button class="product" data-product="${id}"><span class="icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icon}</svg></span><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></svg></span><strong>${name}</strong><small>${tag}</small></button>`).join('');
-$('products').addEventListener('click',e=>{const b=e.target.closest('[data-product]');if(!b)return; state.product=b.dataset.product;applyDefaultPrice();openBuilder();});
+let openingProduct=false;
+$('products').addEventListener('click',async e=>{
+ const b=e.target.closest('[data-product]');if(!b || openingProduct)return;
+ openingProduct=true;b.disabled=true;
+ try{
+  if(sharedPriceUrl){try{defaults=await priceRequest();}catch{defaults={};toast('Shared prices unavailable. Customize the price for this quote or try again.');}}
+  state.product=b.dataset.product;applyDefaultPrice();openBuilder();
+ }finally{openingProduct=false;b.disabled=false;}
+});
 function openBuilder(){
  const product=products.find(p=>p[0]===state.product);
  $('choose').hidden=true;$('builder').hidden=false;$('mobile-total').hidden=false;
@@ -135,3 +189,5 @@ $('print').addEventListener('click',()=>{if(quoteText)window.print();});
 $('clear').addEventListener('click',()=>$('clear-dialog').showModal());
 $('cancel-clear').addEventListener('click',()=>$('clear-dialog').close());
 $('confirm-clear').addEventListener('click',()=>{state.panels=[blankPanel()];applyDefaultPrice();$('rate').value=state.rate;$('basis').value=state.basis;renderPriceMode();renderPanels();update();$('clear-dialog').close();$('height-0').focus();toast('Quote cleared.');});
+
+if(sharedPriceUrl){$('settings-help').textContent='Save each product individually to share its default with everyone. Cancel discards unsaved edits. The same USD number applies per in² or ft². Saving requires the staff edit key.';}

@@ -1,6 +1,6 @@
 # EG Signs Solutions · Quote Builder
 
-Mobile-first static internal quoting app. English, USD, no accounts or backend.
+Mobile-first quoting app. English, USD, no individual app accounts. Hosted on GitHub Pages, with an optional Google Sheets + Apps Script service for shared prices.
 
 ## Open without a server
 
@@ -62,3 +62,11 @@ Run `node tests/settings.cjs` for saved price defaults, the same saved number fo
 Price settings has one USD field per product. Its numeric value applies unchanged to either in² or ft² on the quote page; rates are not converted. Previously saved rates are retained, and their former billing-unit preference is ignored. Quote-page billing units remain selectable without enabling Customize price.
 
 Each product card has its own right-aligned Save price button. Saving validates and persists only that product and keeps the settings page open. Cancel discards unsaved edits but keeps individually saved prices.
+
+## Google Sheets shared prices (activation pending)
+
+The integration and service source are prepared. `price-config.js` intentionally has an empty deployment URL until the Google account owner completes [Google setup](google-apps-script/SETUP.md). Until then, the existing browser-only defaults remain active and the app labels them as such.
+
+After activation, each product/settings opening fetches fresh shared defaults; quote overrides never write to the sheet. A shared staff key is requested when saving and retained only in memory. No Google credentials or edit key are shipped to GitHub Pages. Reads are public, writes validated, and conflicting in-app saves rejected. An unconfirmed request is reported as an error, never silently treated as a successful shared save. Existing browser defaults are not automatically uploaded: enter verified prices after setup.
+
+`node tests/shared-prices.cjs` exercises two isolated browser users against a mocked service. `npm test` also validates the Apps Script handler using mocked Google APIs. Actual Google deployment, cross-origin requests, authorization, and live persistence must still be verified after the web-app URL is configured.
