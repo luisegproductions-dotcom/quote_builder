@@ -32,7 +32,49 @@ try {
   if (p && typeof p.rate === 'string' && p.rate.trim() !== '' && Number.isFinite(Number(p.rate)) && Number(p.rate) >= 0) defaults[id] = {rate:p.rate};
  }
 } catch { /* Quoting remains available when browser storage is unavailable. */ }
-async function priceRequest(payload){
+let googleAuthConfig=null, googleCredential='', googleUser=null, googleExpiryTimer, googleAuthEpoch=0;
+let googleScriptPromise;
+function clearGoogleSession(){
+ googleAuthEpoch++;googleCredential='';googleUser=null;clearTimeout(googleExpiryTimer);
+ $('google-user').textContent='Sign in to save shared prices.';$('google-sign-out').hidden=true;
+ $('google-sign-in').hidden=false;
+}
+function loadGoogleIdentity(){
+ if(window.google?.accounts?.id)return Promise.resolve();
+ if(!googleScriptPromise)googleScriptPromise=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');script.src='https://accounts.google.com/gsi/client';script.async=true;
+  script.onload=resolve;script.onerror=()=>{script.remove();googleScriptPromise=null;reject(new Error('Google sign-in could not load. Check your connection and reopen Price settings.'));};document.head.append(script);
+ });
+ return googleScriptPromise;
+}
+async function configureGoogleAuth(config){
+ if(config?.mode!=='google')return;
+ $('google-auth').hidden=false;
+ rememberStaffKey(''); // Migration removes the previous device key; never send it in Google mode.
+ if(googleAuthConfig?.clientId===config.clientId && window.google?.accounts?.id)return;
+ googleAuthConfig=config;clearGoogleSession();$('settings-help').textContent='Save each product individually to share its default with everyone. Sign in with an approved Google account to save. Cancel discards unsaved edits. Quoting does not require sign-in.';
+ if(!config.clientId){$('google-user').textContent='Staff sign-in is awaiting Google configuration.';return;}
+ if(location.protocol==='file:'){$('google-user').textContent='Open the online quote builder to sign in and save shared prices.';return;}
+ try{
+  await loadGoogleIdentity();
+  window.google.accounts.id.initialize({client_id:config.clientId,auto_select:false,callback:async response=>{
+   const epoch=++googleAuthEpoch;$('google-user').textContent='Checking your account…';
+   try{
+    const data=await serviceRequest({action:'authorize',credential:response.credential});
+    if(epoch!==googleAuthEpoch)return;
+    googleCredential=response.credential;googleUser=data.user;
+    $('google-user').textContent='Signed in as '+googleUser.email;
+    $('google-sign-in').hidden=true;$('google-sign-out').hidden=false;
+    googleExpiryTimer=setTimeout(()=>{clearGoogleSession();$('google-user').textContent='Your session expired. Sign in again to save prices.';},Math.max(0,googleUser.expiresAt-Date.now()));
+   }catch(e){if(epoch===googleAuthEpoch){clearGoogleSession();$('google-user').textContent=e.message;}}
+  }});
+  $('google-sign-in').replaceChildren();
+  window.google.accounts.id.renderButton($('google-sign-in'),{type:'standard',theme:'outline',size:'large',text:'signin_with',width:240});
+ }catch(e){$('google-user').textContent=e.message;}
+}
+$('google-sign-out').addEventListener('click',()=>{clearGoogleSession();window.google?.accounts?.id.disableAutoSelect();});
+async function serviceRequest(payload){
+
  const response=await fetch(sharedPriceUrl,{
   method:payload?'POST':'GET', credentials:'omit', redirect:'follow', cache:'no-store',
   ...(payload?{headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}:{}),
@@ -40,7 +82,17 @@ async function priceRequest(payload){
  });
  if(!response.ok)throw new Error('Shared prices are unavailable. Try again.');
  const data=await response.json();
- if(!data.ok){if(data.code==='unauthorized')rememberStaffKey('');throw new Error(data.error || 'Could not access shared prices.');}
+ if(!data.ok){
+  if(data.code==='unauthorized' || data.code==='forbidden'){
+   if(googleAuthConfig && googleCredential)clearGoogleSession();else if(!googleAuthConfig)rememberStaffKey('');
+  }
+  throw new Error(data.error || 'Could not access shared prices.');
+ }
+ return data;
+}
+async function priceRequest(payload){
+ const data=await serviceRequest(payload);
+ if(data.auth){void configureGoogleAuth(data.auth);}
  const next={};
  for(const [id] of products){
   const rate=data.prices?.[id]?.rate;
@@ -100,11 +152,19 @@ $('settings-form').addEventListener('submit',async e=>{
  if(sharedPriceUrl){
   const button=form.querySelector('button');button.disabled=true;input.disabled=true;status.textContent='Saving…';
   try{
-   const key=await requestEditKey();if(!key){status.textContent='Save canceled.';return;}
-   const next=await priceRequest({product:id,rate,expectedRate:defaults[id]?.rate ?? '',key});
+   let auth;
+   if(googleAuthConfig){
+    if(!googleCredential || !googleUser || googleUser.expiresAt<=Date.now()){
+     clearGoogleSession();status.textContent='Sign in with an approved Google account above, then save again.';$('google-auth').scrollIntoView({behavior:'smooth'});return;
+    }
+    auth={credential:googleCredential};
+   }else{
+    const key=await requestEditKey();if(!key){status.textContent='Save canceled.';return;}auth={key};
+   }
+   const next=await priceRequest({product:id,rate,expectedRate:defaults[id]?.rate ?? '',...auth});
    // Other cards may contain unsaved edits: only update this card's baseline.
    if(next[id])defaults[id]=next[id];else delete defaults[id];
-   rememberStaffKey(key);status.textContent=rate===''?'Shared default removed.':'Price saved for everyone.';
+   if(!googleAuthConfig)rememberStaffKey(auth.key);status.textContent=rate===''?'Shared default removed.':'Price saved for everyone.';
   }catch(e){status.textContent=e.message || 'Save not confirmed. Reopen Price settings to check before retrying.';}
   finally{button.disabled=false;input.disabled=false;}
  }else{

@@ -72,3 +72,11 @@ After activation, each product/settings opening fetches fresh shared defaults; q
 `node tests/shared-prices.cjs` exercises two isolated browser users against a mocked service. `npm test` also validates the Apps Script handler using mocked Google APIs. Live Google reads and cross-origin POST responses have been verified; unauthorized writes are rejected. An authorized live write still requires a staff member to enter the private EDIT_KEY in the app. `node tests/shared-live.cjs` performs non-mutating live connectivity checks.
 
 Staff edit keys are stored in localStorage on the staff device after a successful save, scoped to the service URL. Forget saved key removes that device’s saved key. Rejected keys are cleared automatically. A private browsing session or blocked browser storage may require entering the key again.
+
+## Google account sign-in upgrade (Google activation pending)
+
+The frontend supports Google Identity Services, and the new Apps Script source verifies signed ID tokens and the staff allowlist on every write. Run through [Google sign-in activation](google-apps-script/GOOGLE-SIGN-IN.md) to create the OAuth client and update the existing service. Until the service is redeployed, the frontend preserves its previous key flow; this compatibility does not grant key access to the new service.
+
+Approved accounts: info@11eg11.com (Workspace), luis.egproductions@gmail.com, suarezl@gmail.com. Configure ALLOWED_EMAILS and GOOGLE_CLIENT_ID in server script properties. The public GET response supplies the client ID to the frontend, so it cannot drift from the server's expected audience. Tokens are memory-only, with sign-out and expiry handling. Prices remain public, while writes require server approval. Columns D/E record the editor and time.
+
+`npm test` verifies real RSA signatures using local test keys, issuer/audience/expiry checks, denied/removed users, and legacy-key rejection. `node tests/google-auth.cjs` tests mocked Google sign-in, expiry, logout, denied writes, and public quoting. An actual Google-authorized save remains pending Google setup. Existing shared-price tests exercise compatibility with the currently deployed legacy service.

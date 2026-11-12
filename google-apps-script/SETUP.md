@@ -1,19 +1,9 @@
-# Shared prices: one-time Google setup
+# Google Sheets price service setup
 
-The quote builder remains on GitHub Pages. Google Sheets holds eight shared prices; Apps Script reads and updates them. No database or individual app accounts are required.
+For the existing EG quote builder, follow [Activate Google sign-in](GOOGLE-SIGN-IN.md). This replaces the staff key with approved Google accounts while retaining your current spreadsheet and URL.
 
-1. In the intended Google account, open https://script.google.com/home/start and create a New project. Name it **EG Quote Builder Prices**.
-2. Replace the contents of `Code.gs` with this folder's `Code.gs`.
-3. Select **setup** in the function picker, click **Run**, and authorize access. This creates a private spreadsheet with all eight products and blank prices. The execution log contains its link. Run setup again safely if needed; it does not erase existing data.
-4. Open **Project Settings → Script properties**. Keep the generated `EDIT_KEY` private and give it only to staff who may save defaults. Do not put it in GitHub or send it in chat. Users enter it once when saving; this browser remembers it after a successful save; use Forget saved key to remove it.
-5. Choose **Deploy → New deployment → Web app**. Set **Execute as: Me** and **Who has access: Anyone**. Deploy and authorize. If your Workspace policy disallows Anyone, tell us; this deployment will not work with sign-in-only access from GitHub Pages.
-6. Send the **Web app URL** ending in `/exec` to the developer. This URL is public, not the edit key. The developer sets `window.EG_PRICE_SERVICE_URL` in `price-config.js`, publishes, and verifies Google-to-browser reads and saves.
-7. Enter your real prices through Price settings after activation (or edit column C in the sheet). Blank removes a default; zero is a valid price. Keep product IDs in column A unchanged. No prices are inferred from screenshots or silently uploaded from a browser.
+For a new installation, paste `Install.gs` into a new Apps Script project and run `setup` once to create the sheet. Then follow the Google OAuth configuration in the sign-in guide. Deploy as a Web app, execute as Me, access Anyone. Configure the resulting public `/exec` URL in `price-config.js`.
 
-Price reads are public, just like the quote builder. Only writes require the staff key; the sheet itself need not be shared publicly. To revoke a key, replace EDIT_KEY in Script properties and give the new value to staff. Never embed a Google credential in the static app.
+The three approved staff accounts are `info@11eg11.com`, `luis.egproductions@gmail.com`, and `suarezl@gmail.com`. Only the server's ALLOWED_EMAILS property controls write access. Public reads and quoting need no login. No product prices are prefilled or inferred from browser screenshots.
 
-Shared prices refresh when a product or Price settings is opened. An open quote keeps its price until reopened, so another user's edit cannot silently alter a quote in progress. Concurrent in-app edits to the same product are rejected when its saved value has changed. Save updates only that product. Avoid editing the same cell directly in Sheets while a staff member is saving in the app (Apps Script locks cannot lock manual spreadsheet edits).
-
-If Google is unavailable, the app reports the failure and does not claim a save succeeded. Custom quote prices still work. Shared defaults need internet access, including in the standalone HTML. The previous local-only mode remains active until a deployment URL is configured; no shared sync is claimed before activation.
-
-Staff edit keys are stored in localStorage on the staff device after a successful save, scoped to the service URL. Forget saved key removes that device’s saved key. Rejected keys are cleared automatically. A private browsing session or blocked browser storage may require entering the key again.
+If the service is still running its earlier deployed version, the live app continues its previous key-based behavior until you redeploy. The repository's current service source does not accept shared keys.
